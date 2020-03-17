@@ -1,3 +1,6 @@
+#ifndef BIM_SELECTION_H
+#define BIM_SELECTION_H
+
 /* *****************************************************************************
 Copyright (c) 2016-2017, The Regents of the University of California (Regents).
 All rights reserved.
@@ -17,7 +20,7 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
 ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
@@ -36,29 +39,45 @@ UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 // Written: fmckenna
 
-#include <SimCenterWidget.h>
-SimCenterWidget::SimCenterWidget(QWidget *parent)
-    :QWidget(parent)
+#include <SimCenterAppWidget.h>
+
+class QComboBox;
+class QStackedWidget;
+class RandomVariablesContainer;
+class UQ_Results;
+class UQ_Engine;
+class RandomVariablesContainer;
+
+class BIM_Selection : public  SimCenterAppWidget
 {
+  Q_OBJECT
 
-}
+    public:
 
-SimCenterWidget::~SimCenterWidget()
-{
+  explicit BIM_Selection(RandomVariablesContainer *, QWidget *parent = 0);
+  ~BIM_Selection();
 
-}
+  bool outputAppDataToJSON(QJsonObject &jsonObject);
+  bool inputAppDataFromJSON(QJsonObject &jsonObject);
+  bool outputToJSON(QJsonObject &rvObject);
+  bool inputFromJSON(QJsonObject &rvObject);
+  bool copyFiles(QString &destName);
+  
+  void clear(void);
+  
+ signals:
+  void onSelectionChanged(void);
 
+ public slots:
+  void selectionChanged(const QString &arg1);
+  void selectionChanged(void);
+  
+private:
+   QComboBox   *theSelectionBox;
+   QStackedWidget *theStackedWidget;
 
-bool
-SimCenterWidget::outputToJSON(QJsonObject &jsonObject)
-{
-    Q_UNUSED(jsonObject);
-    return true;
-}
+   SimCenterAppWidget *theCurrentSelection;
+   SimCenterAppWidget *theOpenSeesApplication;
+};
 
-bool
-SimCenterWidget::inputFromJSON(QJsonObject &jsonObject)
-{
-    Q_UNUSED(jsonObject);
-    return true;
-}
+#endif // BIM_SELECTION_H

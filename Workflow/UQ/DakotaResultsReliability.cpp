@@ -131,7 +131,7 @@ void DakotaResultsReliability::clear(void)
 
 int DakotaResultsReliability::processResults(QString &filenameResults, QString &filenameTab)
 {
-
+  Q_UNUSED(filenameTab);
   emit sendStatusMessage(tr("Processing Reliability Results"));
 
   // clear current
@@ -216,10 +216,6 @@ int DakotaResultsReliability::processResults(QString &filenameResults, QString &
       while (std::getline(fileResults, haystack)) {
           if (haystack.find(needleStart) != std::string::npos) {
               break;
-          }
-          else {
-              if (numSpreadsheetRows > 0)
-                  ;
           }
       }
 
@@ -353,12 +349,9 @@ void DakotaResultsReliability::onSpreadsheetCellClicked(int row, int col)
 
     chart->removeAllSeries();
 
-    QAbstractAxis *oldAxisX=chart->axisX();
-    if (oldAxisX != 0)
-        chart->removeAxis(oldAxisX);
-    QAbstractAxis *oldAxisY=chart->axisY();
-    if (oldAxisY != 0)
-        chart->removeAxis(oldAxisY);
+    //Remove all axes
+    for(auto axis: chart->axes())
+        chart->removeAxis(axis);
 
     //
     // create new line series & plot
@@ -399,8 +392,10 @@ void DakotaResultsReliability::onSpreadsheetCellClicked(int row, int col)
     axisY->setTickCount(5);
     axisX->setTickCount(NUM_DIVISIONS+1);
 
-    chart->setAxisX(axisX, series);
-    chart->setAxisY(axisY, series);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
 }
 
 
@@ -438,8 +433,6 @@ DakotaResultsReliability::outputToJSON(QJsonObject &jsonObject)
 
     QJsonObject spreadsheetData;
 
-    int numCol = spreadsheet->columnCount();
-    int numRow = spreadsheet->rowCount();
 
     spreadsheetData["numRow"]=numSpreadsheetRows;
     spreadsheetData["numCol"]=numSpreadsheetCols;
@@ -474,6 +467,7 @@ DakotaResultsReliability::outputToJSON(QJsonObject &jsonObject)
 bool
 DakotaResultsReliability::inputFromJSON(QJsonObject &jsonObject)
 {
+    Q_UNUSED(jsonObject);
     bool result = true;
 
     /*
